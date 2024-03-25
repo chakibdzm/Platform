@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+enum Role {
+  USER
+  ADMIN
+}
+
+
+model User {
+  id      Int      @id @default(autoincrement())
+  name    String?
+  password String?
+  score Int? @default(0)
+  nbBadge Int? @default(0)
+  enabled       Boolean   @default(true)
+  role Role @default(USER)
+  submissions  Submission[]
+}
+
+model Verse{
+  id Int @id @default(autoincrement())
+  title String?
+  challenges Challenge[]
+}
+
+
+enum Field {
+  DESIGN
+  CYBERSECURITY
+  PROBLEMSOLVING
+  AI
+}
+enum TYPE {
+  LINK
+  KEY
+}
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+//one to many relation Verse to challenge[]
+model Challenge {
+  id Int @id @default(autoincrement())
+  title String?
+  story String?
+  hint  Field
+  point Int?
+  flag String?
+  difficulty   Difficulty  @default(EASY)
+  files String
+  submitType TYPE
+  verse Verse @relation(fields: [verseId],references: [id])
+  verseId Int
+  submissions   Submission[]
+}
+
+
+
+//here kayn challenge submition one to many relations and many to many for submition we can have many submits to a single challenge , many users submits many flags
+
+model Submission {
+  id           Int       @id @default(autoincrement())
+  submittedBy  Int
+  user         User      @relation(fields: [submittedBy], references: [id])
+  challengeId  Int
+  challenge    Challenge @relation(fields: [challengeId], references: [id])
+  flag         String?   @db.Text
+  isCorrect    Boolean   @default(false)
+  submittedAt  DateTime  @default(now())
+
+}
