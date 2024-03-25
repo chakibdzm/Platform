@@ -23,7 +23,7 @@ enum Role {
 
 model User {
   id      Int      @id @default(autoincrement())
-  name    String?
+  name    String?  @unique
   password String?
   score Int? @default(0)
   nbBadge Int? @default(0)
