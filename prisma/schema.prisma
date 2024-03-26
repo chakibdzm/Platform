@@ -9,8 +9,8 @@ datasource db {
 
 model User {
   id          Int          @id @default(autoincrement())
-  name        String?
-  password    String?      @unique
+  name        String?      @unique
+  password    String?      
   score       Int?         @default(0)
   nbBadge     Int?         @default(0)
   enabled     Boolean      @default(true)
