@@ -10,7 +10,7 @@ datasource db {
 model User {
   id          Int          @id @default(autoincrement())
   name        String?
-  password    String?
+  password    String?      @unique
   score       Int?         @default(0)
   nbBadge     Int?         @default(0)
   enabled     Boolean      @default(true)
@@ -29,7 +29,7 @@ model Challenge {
   title       String?
   story       String?
   hint        Field
-  total_points       Int?
+  total_points Int?
   isEnabled   Boolean @default(false)
   difficulty  Difficulty   @default(EASY)
   files       String
