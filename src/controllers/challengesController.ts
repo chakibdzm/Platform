@@ -94,7 +94,7 @@ export async function checkFlagAndAwardPoints(submittedBy: number, challengeId: 
             return false;
         }
 
-    
+        
         const extraPoints = flag.points || 500; 
         await db.user.update({
             where: {
@@ -106,6 +106,8 @@ export async function checkFlagAndAwardPoints(submittedBy: number, challengeId: 
                 }
             }
         });
+
+
 
         return true;
     } catch (error) {
