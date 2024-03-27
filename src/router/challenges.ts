@@ -67,6 +67,33 @@ ChallengeRouter.post('/api/submit',async(request:Request,response:Response)=>{
                 isCorrect: true
             }
         });
+        //here njibo challenge id submitted correctly w ncheckiw verse count challenges l had user mn submits table ida kan count 5 
+        const  challenge = await Chall.getChallengebyId(challengeId);
+        const correctSubmissionsCount = await db.submission.count({
+            where: {
+              isCorrect: true,
+              challenge: { verseId: challenge?.verse.id},
+              submittedBy:submittedBy
+            },
+          });
+        
+          if (correctSubmissionsCount >= 5) {
+            const user = await db.user.findUnique({
+              where: { id: submittedBy },
+            });
+      
+            if (!user) {
+             
+              return response.status(404);
+            }
+            const nbBadge = user.nbBadge ?? 0;
+            await db.user.update({
+              where: { id: user.id },
+              data: { nbBadge: nbBadge + 1 },
+            });
+
+            return response.status(200).json("congratulations you completed the verse")
+          }
 
         return response.status(200).json("Congratulations You Found it");
         
@@ -79,8 +106,4 @@ ChallengeRouter.post('/api/submit',async(request:Request,response:Response)=>{
     }
 })
 
-//update challenge visibility by id
-
-
-
-//update challenges visibility by waves
+//upate nbr badge if the verse is completed
