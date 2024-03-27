@@ -9,6 +9,8 @@ adminRouter.post('/challenge',requireAdminRole,adminController.createChallenge)
 adminRouter.put('/challenge/:id',requireAdminRole, adminController.updateChallenge);
 adminRouter.delete('/challenge/:id',requireAdminRole, adminController.deleteChallenge);
 adminRouter.get('/challenge',requireAdminRole, adminController.getAllChallenges);
+adminRouter.get('/challenge/:challengeId',requireAdminRole, adminController.getChallengeDetails);
+
 
 
 
