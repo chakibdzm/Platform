@@ -4,6 +4,7 @@ import cors from "cors";
 import { ScoreRouter } from "./router/scoreboard";
 import { ChallengeRouter } from "./router/challenges";
 import authrouter from "./router/auth";
+import adminRouter from "./admin/adminRouter";
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
@@ -22,7 +23,8 @@ app.use(cors());
 app.use(express.json());
 app.use("/",ScoreRouter);
 app.use("/",ChallengeRouter);
-app.use(authrouter)
+app.use(authrouter);
+app.use(adminRouter);
 
 app.listen(PORT,() =>  {
     console.log('listening on port '+PORT);
