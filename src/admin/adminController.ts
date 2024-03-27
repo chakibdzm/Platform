@@ -62,5 +62,98 @@ export const adminController = {
         }
     },
 
+
+    createChallenge : async (req: Request, res: Response) => {
+    const { title, story, hint, total_points, isEnabled, difficulty, files, submitType, verseId } = req.body;
+
+    try {
+        const challenge = await prisma.challenge.create({
+            data: {
+                title,
+                story,
+                hint,
+                total_points,
+                isEnabled,
+                difficulty,
+                files,
+                submitType,
+                verseId,
+            },
+        });
+
+        res.status(201).json(challenge);
+    } catch (error) {
+        console.error('Error creating challenge:', error);
+        res.status(500).json({ error: 'Failed to create challenge' });
+    }
+},
+
+    updateChallenge : async (req: Request, res: Response) => {
+    const { id } = req.params; // Get the challenge ID from the request params
+    const { title, story, hint, total_points, isEnabled, difficulty, files, submitType, verseId } = req.body;
+
+    try {
+        // Check if the challenge exists
+        const existingChallenge = await prisma.challenge.findUnique({ where: { id: parseInt(id) } });
+        if (!existingChallenge) {
+            return res.status(404).json({ error: 'Challenge not found' });
+        }
+
+        // Update the challenge
+        const updatedChallenge = await prisma.challenge.update({
+            where: { id: parseInt(id) },
+            data: {
+                title,
+                story,
+                hint,
+                total_points,
+                isEnabled,
+                difficulty,
+                files,
+                submitType,
+                verseId,
+            },
+        });
+
+        res.json(updatedChallenge);
+    } catch (error) {
+        console.error('Error updating challenge:', error);
+        res.status(500).json({ error: 'Failed to update challenge' });
+    }
+},
+
+    deleteChallenge : async (req: Request, res: Response) => {
+        const challengeId = parseInt(req.params.id);
+
+        try {
+            const existingChallenge = await prisma.challenge.findUnique({
+                where: { id: challengeId },
+            });
+    
+            if (!existingChallenge) {
+                return res.status(404).json({ error: 'Challenge not found' }); 
+            }
+    
+            await prisma.challenge.delete({
+                where: { id: challengeId },
+            });
+    
+            res.status(204).end(); 
+        } catch (error) {
+            console.error('Error deleting challenge:', error);
+            return res.status(500).json({ error: 'Failed to delete challenge' }); 
+        }
+    
+},
+
+    getAllChallenges : async (req: Request, res: Response) => {
+    try {
+        const challenges = await prisma.challenge.findMany();
+        res.json(challenges);
+    } catch (error) {
+        console.error('Error fetching challenges:', error);
+        res.status(500).json({ error: 'Failed to fetch challenges' });
+    }
+},
     
 };
