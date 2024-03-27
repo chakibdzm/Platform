@@ -1,12 +1,12 @@
 const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient();
+const db = new PrismaClient();
 
 async function createData() {
   try {
    
     const users = await Promise.all([
-      prisma.user.create({
+      db.user.create({
         data: {
           name: 'John',
           password: 'password123',
@@ -15,7 +15,7 @@ async function createData() {
           role: 'USER'
         }
       }),
-      prisma.user.create({
+      db.user.create({
         data: {
           name: 'Alice',
           password: 'alice123',
@@ -24,7 +24,7 @@ async function createData() {
           role: 'USER'
         }
       }),
-      prisma.user.create({
+      db.user.create({
         data: {
           name: 'moha',
           password: 'alice123',
@@ -33,7 +33,7 @@ async function createData() {
           role: 'USER'
         }
       }),
-      prisma.user.create({
+      db.user.create({
         data: {
           name: 'chakib',
           password: 'alice123',
@@ -47,12 +47,12 @@ async function createData() {
 
     // Create Verses
     const verses = await Promise.all([
-      prisma.verse.create({
+      db.verse.create({
         data: {
           title: 'Verse 1'
         }
       }),
-      prisma.verse.create({
+      db.verse.create({
         data: {
           title: 'Verse 2'
         }
@@ -62,7 +62,7 @@ async function createData() {
 
     // Create Challenges
     const challenges = await Promise.all([
-      prisma.challenge.create({
+      db.challenge.create({
         data: {
           title: 'Challenge 1',
           story: 'Story of challenge 1',
@@ -75,7 +75,7 @@ async function createData() {
           verseId: verses[0].id
         }
       }),
-      prisma.challenge.create({
+      db.challenge.create({
         data: {
           title: 'Challenge 2',
           story: 'Story of challenge 2',
@@ -88,7 +88,7 @@ async function createData() {
           verseId: verses[0].id
         }
       }),
-      prisma.challenge.create({
+      db.challenge.create({
         data: {
           title: 'Challenge 3',
           story: 'Story of challenge 3',
@@ -106,14 +106,14 @@ async function createData() {
 
     // Create Flags
     const flags = await Promise.all([
-      prisma.flag.create({
+      db.flag.create({
         data: {
           key: 'flag1',
           points: 500,
           challengeId: challenges[0].id
         }
       }),
-      prisma.flag.create({
+      db.flag.create({
         data: {
           key: 'flag2',
           points: 600,
@@ -130,7 +130,7 @@ async function createData() {
   } catch (error) {
     console.error('Error creating data:', error);
   } finally {
-    await prisma.$disconnect();
+    await db.$disconnect();
   }
 }
 

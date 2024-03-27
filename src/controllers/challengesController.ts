@@ -24,6 +24,7 @@ export async function getChallengebyId(challengeId:number) {
         select:{
             id:true,
             title:true,
+            verse:true,
             story:true,
             hint:true,
             total_points:true,
@@ -116,4 +117,8 @@ export async function checkFlagAndAwardPoints(submittedBy: number, challengeId: 
 
 
 
- 
+ //update nbr badge user
+
+
+
+
