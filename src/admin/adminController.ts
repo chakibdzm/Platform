@@ -157,22 +157,20 @@ export const adminController = {
 },
 
     getChallengeDetails : async (req: Request, res: Response) => {
-        const { challengeId } = req.params; // Get the challenge ID from request params
+        const { challengeId } = req.params; 
 
         try {
-            // Ensure challengeId is provided and parse it to integer
             if (!challengeId) {
                 return res.status(400).json({ error: 'Challenge ID is required' });
             }
             const id = parseInt(challengeId);
     
-            // Find the challenge with the given ID
             const challenge = await prisma.challenge.findUnique({
                 where: {
-                    id: id, // Pass the parsed challenge ID
+                    id: id, 
                 },
                 include: {
-                    // Include related data such as submissions, verse, etc. if needed
+                  
                 },
             });
     
@@ -180,7 +178,7 @@ export const adminController = {
                 return res.status(404).json({ error: 'Challenge not found' });
             }
     
-            res.json(challenge); // Send the challenge details as JSON response
+            res.json(challenge);
         } catch (error) {
             console.error('Error fetching challenge details:', error);
             res.status(500).json({ error: 'Failed to fetch challenge details' });
