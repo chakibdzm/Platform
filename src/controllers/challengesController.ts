@@ -1,7 +1,7 @@
 //here all db req such as get all challenges , post the submits ,get the submits from table
 import { db } from '../utils/db.server';
 import * as jwt from "jsonwebtoken";
-import type { Request,Response } from 'express';
+import { response, type Request,type Response } from 'express';
 import {DecodedToken} from '../middleware/authuser';
 
 export async function listVerse() {
@@ -76,14 +76,17 @@ export async function getChallenges(verseid:number) {
 }
 
  async function Submit(Submittedby:any,challengeid:number,flag:string) {
-    return db.submission.create({
-        data: {
-            submittedBy: Submittedby,
-            challengeId: challengeid,
-            flag: flag,
-            submittedAt: new Date()
-        }
-    });
+
+   
+         return db.submission.create({
+            data: {
+                submittedBy: Submittedby,
+                challengeId: challengeid,
+                flag: flag,
+                submittedAt: new Date()
+            }
+        });
+    
     
 }
 
@@ -137,6 +140,14 @@ export async function getChallenges(verseid:number) {
     }
 }
 
+
+
+
+
+
+
+
+
 export const SubmitChallenge = async(request:Request,response:Response)=>{
     const {challengeId, flag } = request.body;   
     try{
@@ -144,14 +155,20 @@ export const SubmitChallenge = async(request:Request,response:Response)=>{
         if (!token) {
         return response .status(401).json({ error: 'Unauthorized: No token provided' });
          }
+
+         const challenge=await getChallengebyId(challengeId);
+         if(!challenge || challenge.isEnabled==false){
+             return response.status(404).json({ error: 'Challenge not found' });
+         }
+
          const decodedToken= await jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
          const submittedBy = decodedToken.userId;
-
         const submit =await Submit(submittedBy,challengeId,flag);
         const check =await checkFlagAndAwardPoints(submittedBy, challengeId, flag);
         if (check==false){
             return response.status(200).json("naah !!!");
         }
+
         await db.submission.updateMany({
             where: {
                 id:submit.id
@@ -161,7 +178,7 @@ export const SubmitChallenge = async(request:Request,response:Response)=>{
             }
         });
         //here njibo challenge id submitted correctly w ncheckiw verse count challenges l had user mn submits table ida kan count 5 
-        const  challenge = await getChallengebyId(challengeId);
+     
         const correctSubmissionsCount = await db.submission.count({
             where: {
               isCorrect: true,
@@ -199,11 +216,18 @@ export const SubmitChallenge = async(request:Request,response:Response)=>{
     }
 }
 
+
+
+
+
 export const VersebyId =async(request:Request,response:Response)=>{
     const id=parseInt(request.params.id)
     
     try{
         const challenge=await getChallenges(id);
+        if(!challenge){
+            return response.status(404).json("Cannot provide you This Verse Challenges ,try again")
+        }
         return response.status(200).json(challenge);
 
     }
@@ -216,6 +240,9 @@ export const VersebyId =async(request:Request,response:Response)=>{
 export const allVerses =async (request:Request, response:Response)=>{
     try{
         const verses = await listVerse();
+        if (!verses){
+            return response.status(404).json("Did Not found please try again !")
+        }
         return response.status(200).json(verses);
     }catch(error:any){
         return response.status(500).json(error.message);

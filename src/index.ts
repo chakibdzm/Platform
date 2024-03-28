@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
+import helmet from 'helmet';
 import { ScoreRouter } from "./router/scoreboard";
 import { ChallengeRouter } from "./router/challenges";
 import authrouter from "./router/auth";
@@ -17,7 +18,7 @@ const corsOptions = {
     Credential: true,
     optionSuccessStatus:200,
   };
-  
+app.use(helmet());  
 app.use(cors(corsOptions));
 app.use(cors());
 app.use(express.json());
