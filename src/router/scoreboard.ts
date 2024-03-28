@@ -2,13 +2,18 @@
 
 import * as ScoarboardList from '../controllers/scoreboardController';
 import express from "express";
-import { Auth } from '../middleware/authuser';
+import { middleware } from '../middleware/authuser';
 import type { Request,Response } from 'express';
 export const ScoreRouter= express.Router();
 
-ScoreRouter.get('/api/scoreboard',Auth ,async (request:Request, response:Response) =>{
+ScoreRouter.get('/api/scoreboard',[middleware.Auth,middleware.limiter],async (request:Request, response:Response) =>{
     try {
         const users=await ScoarboardList.listUsers();
+        if (!users)
+        {
+            return response.status(500)
+        
+        }
         return response.status(200).json(users)
     }catch(error :any)
     {

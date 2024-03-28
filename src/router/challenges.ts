@@ -1,17 +1,17 @@
 import {SubmitChallenge,challengebyId,VersebyId,allVerses} from '../controllers/challengesController';
 import express from "express";
-import { Auth} from '../middleware/authuser';
+import { middleware} from '../middleware/authuser';
 
 
 
 export const ChallengeRouter= express.Router();
 
 //all verses
-ChallengeRouter.get('/api/verses',Auth,)
+ChallengeRouter.get('/api/verses',[middleware.Auth,middleware.limiter],allVerses)
 //get all verse_id challenges
-ChallengeRouter.get('/api/verse/:id/',Auth,VersebyId)
+ChallengeRouter.get('/api/verse/:id/',[middleware.Auth,middleware.limiter],VersebyId)
 //get by id
-ChallengeRouter.get('/api/challenges/:id',Auth,challengebyId)
+ChallengeRouter.get('/api/challenges/:id',[middleware.Auth,middleware.limiter],challengebyId)
 //submit & check flag & update nbrbadge
-ChallengeRouter.post('/api/submit',Auth ,SubmitChallenge)
+ChallengeRouter.post('/api/submit',[middleware.Auth,middleware.limiter] ,SubmitChallenge)
 
