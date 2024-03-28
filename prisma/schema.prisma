@@ -16,6 +16,7 @@ model User {
   enabled     Boolean      @default(true)
   role        Role         @default(USER)
   submissions Submission[]
+
 }
 
 model Verse {
@@ -31,13 +32,17 @@ model Challenge {
   hint        Field
   total_points Int?
   isEnabled   Boolean @default(false)
+  isGreen     Boolean @default(false)
   difficulty  Difficulty   @default(EASY)
   files       String
   submitType  TYPE
   verseId     Int
   verse       Verse        @relation(fields: [verseId], references: [id])
   submissions Submission[]
-  flag Flag[]
+  flag        Flag[]
+  
+
+
 }
 
 
