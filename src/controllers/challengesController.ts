@@ -9,20 +9,38 @@ export async function listVerse() {
         select : {
             id:true,
             title: true,
-            challenges:{
-                select:{
-                    id:true
-                }
-            }
            
         }
     })
 }
 
- async function getChallengebyId(challengeId:number) {
+ async function getChallengebyId(challengeId:number,verse_id:number) {
     return db.challenge.findUnique({
         where:{
             id:challengeId,
+            verseId:verse_id,
+        },
+        select:{
+            id:true,
+            title:true,
+            verse:true,
+            story:true,
+            hint:true,
+            total_points:true,
+            difficulty:true,
+            files:true,
+            isEnabled:true,
+        }
+    }
+
+    )
+}
+
+async function ChallengebyId(challengeId:number) {
+    return db.challenge.findUnique({
+        where:{
+            id:challengeId,
+            
         },
         select:{
             id:true,
@@ -42,9 +60,11 @@ export async function listVerse() {
 
 //get challenge id 
 export const challengebyId=async(request:Request,response:Response)=>{
+    const verse_id= parseInt(request.params.verse_id);
     const id= parseInt(request.params.id);
+    
     try{
-        const challenge=await getChallengebyId(id);
+        const challenge=await getChallengebyId(id,verse_id);
         if(!challenge || challenge.isEnabled==false){
             return response.status(404).json({ error: 'Challenge not found' });
         }
@@ -71,6 +91,8 @@ export async function getChallenges(verseid:number) {
         },
         where:{
             verseId:verseid,
+            isEnabled:true
+    
         }
     })
 }
@@ -149,14 +171,15 @@ export async function getChallenges(verseid:number) {
 
 
 export const SubmitChallenge = async(request:Request,response:Response)=>{
-    const {challengeId, flag } = request.body;   
+    const {flag } = request.body;
+    const challengeId=parseInt(request.params.id);
     try{
         const token = request.headers.authorization?.split(' ')[1];
         if (!token) {
         return response .status(401).json({ error: 'Unauthorized: No token provided' });
          }
 
-         const challenge=await getChallengebyId(challengeId);
+         const challenge=await ChallengebyId(challengeId);
          if(!challenge || challenge.isEnabled==false){
              return response.status(404).json({ error: 'Challenge not found' });
          }
@@ -177,33 +200,7 @@ export const SubmitChallenge = async(request:Request,response:Response)=>{
                 isCorrect: true
             }
         });
-        //here njibo challenge id submitted correctly w ncheckiw verse count challenges l had user mn submits table ida kan count 5 
-     
-        const correctSubmissionsCount = await db.submission.count({
-            where: {
-              isCorrect: true,
-              challenge: { verseId: challenge?.verse.id},
-              submittedBy:submittedBy
-            },
-          });
-        
-          if (correctSubmissionsCount >= 5) {
-            const user = await db.user.findUnique({
-              where: { id: submittedBy },
-            });
-      
-            if (!user) {
-             
-              return response.status(404);
-            }
-            const nbBadge = user.nbBadge ?? 0;
-            await db.user.update({
-              where: { id: submittedBy },
-              data: { nbBadge: nbBadge + 1 },
-            });
 
-            return response.status(200).json("congratulations you completed the verse")
-          }
 
         return response.status(200).json("Congratulations You Found it");
         
@@ -253,4 +250,113 @@ export const allVerses =async (request:Request, response:Response)=>{
 
 
 
+//We check the truth of completed verse (not)
 
+export const VerseBadge = async (request:Request,response:Response) => {
+    const verse_id=parseInt(request.params.verse_id);
+    const token = request.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return response .status(401).json({ error: 'Unauthorized: No token provided' });
+         };
+    try{
+        
+         const decodedToken= await jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
+         const submittedBy = decodedToken.userId;
+         const completed= await checkVerseCompleted(submittedBy,verse_id);
+
+         if(!completed)
+            {
+                response.status(404).json("You Didnt finish All Challesnges !");
+            };
+        return response.status(200).json("Congratulations you unlocked The badge");
+
+        }
+    catch(error:any){
+        return response.status(500).json("Error! something Happend retry again !")
+    }
+
+}
+
+
+
+
+
+ async function checkVerseCompleted(submittedBy: any, verseId: number): Promise<boolean> {
+    try {
+        const challenges = await db.challenge.findMany({
+            where: {
+                verseId: verseId,
+                isEnabled:true
+            }
+        });
+
+        for (const challenge of challenges) {
+            const isCompleted = await checkChallengeCompleted(submittedBy, challenge.id);
+            if (!isCompleted) {
+                return false; 
+            }
+        }
+        await updateNBBadge(submittedBy);
+        return true; // If all challenges are completed, return true
+    } catch (error) {
+        console.error('Error checking category completion:', error);
+        throw error;
+    }
+}
+
+
+export async function updateNBBadge(submittedBy: any): Promise<void> {
+    try {
+        const user = await db.user.findUnique({
+            where: {
+                id: submittedBy,
+            }
+        });
+
+        if (user) {
+            const nbBadge = user.nbBadge ?? 0;
+            await db.user.update({
+                where: {
+                    id: submittedBy,
+                },
+                data: {
+                    nbBadge: nbBadge + 1,
+                },
+            });
+        }
+    } catch (error) {
+        console.error('Error updating nbbadge:', error);
+        throw error;
+    }
+}
+
+
+async function checkChallengeCompleted(submittedBy: any, challengeId: number): Promise<boolean> {
+    try {
+        const flags = await db.flag.findMany({
+            where: {
+                challengeId: challengeId,
+            }
+        });
+
+        for (const flag of flags) {
+            const existingSubmission = await db.submission.findFirst({
+                where: {
+                    submittedBy: submittedBy,
+                    challengeId: challengeId,
+                    flag: flag.key,
+                    isCorrect: true,
+                }
+            });
+
+            if (!existingSubmission || !existingSubmission.isCorrect) {
+                return false;
+            }
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Error checking challenge completion:', error);
+        throw error;
+    }
+}
