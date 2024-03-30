@@ -32,7 +32,7 @@ model Challenge {
   hint        Field
   total_points Int?
   isEnabled   Boolean @default(false)
-  isGreen     Boolean @default(false)
+  wave        Int?
   difficulty  Difficulty   @default(EASY)
   files       String
   submitType  TYPE
