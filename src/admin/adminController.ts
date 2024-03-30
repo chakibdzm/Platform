@@ -184,5 +184,30 @@ export const adminController = {
             res.status(500).json({ error: 'Failed to fetch challenge details' });
         }
 },
+
+
+   getAllVerses : async (req: Request, res: Response) => {
+    try {
+        const verses = await prisma.verse.findMany();
+        res.json(verses);
+    } catch (error) {
+        console.error('Error fetching verses:', error);
+        res.status(500).json({ error: 'Failed to fetch verses' });
+    }
+},
+
+    getVerseById : async (req: Request, res: Response) => {
+    const verseId = parseInt(req.params.id);
+    try {
+        const verse = await prisma.verse.findUnique({ where: { id: verseId } });
+        if (!verse) {
+            return res.status(404).json({ error: 'Verse not found' });
+        }
+        res.json(verse);
+    } catch (error) {
+        console.error('Error fetching verse:', error);
+        res.status(500).json({ error: 'Failed to fetch verse' });
+    }
+}
     
 };

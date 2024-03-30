@@ -11,6 +11,12 @@ adminRouter.delete('/challenge/:id',requireAdminRole, adminController.deleteChal
 adminRouter.get('/challenge',requireAdminRole, adminController.getAllChallenges);
 adminRouter.get('/challenge/:challengeId',requireAdminRole, adminController.getChallengeDetails);
 
+adminRouter.get('/verse',requireAdminRole, adminController.getAllVerses);
+adminRouter.get('/verse/:id',requireAdminRole, adminController.getVerseById);
+
+
+
+
 
 
 
