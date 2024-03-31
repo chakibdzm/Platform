@@ -252,60 +252,62 @@ export const allVerses =async (request:Request, response:Response)=>{
 
 //We check the truth of completed verse (not)
 
-export const VerseBadge = async (request:Request,response:Response) => {
+
+export async function checkVerseCompleted(request:Request,response:Response){
     const verse_id=parseInt(request.params.verse_id);
     const token = request.headers.authorization?.split(' ')[1];
     if (!token) {
         return response .status(401).json({ error: 'Unauthorized: No token provided' });
          };
-    try{
-        
-         const decodedToken= await jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
-         const submittedBy = decodedToken.userId;
-         const completed= await checkVerseCompleted(submittedBy,verse_id);
-
-         if(!completed)
-            {
-                response.status(404).json("You Didnt finish All Challesnges !");
-            };
-        return response.status(200).json("Congratulations you unlocked The badge");
-
-        }
-    catch(error:any){
-        return response.status(500).json("Error! something Happend retry again !")
-    }
-
-}
-
-
-
-
-
- async function checkVerseCompleted(submittedBy: any, verseId: number): Promise<boolean> {
     try {
+        
+        const verse=await db.verse.findUnique({
+            where : {
+                id:verse_id
+            }
+
+        });
+        if (!verse){
+
+            return response.status(404).json("verse not found ")
+        }
+        const challengesCount = await db.challenge.count({
+            where: {
+              verseId: verse_id,
+            },
+          });
+        if(challengesCount==0){
+            return response.status(404).json("Not yet For this Action")
+        }
+
+        const decodedToken= await jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
+        const submittedBy = decodedToken.userId;
+        
         const challenges = await db.challenge.findMany({
             where: {
-                verseId: verseId,
+                verseId: verse_id,
                 isEnabled:true
             }
         });
-
+      
         for (const challenge of challenges) {
             const isCompleted = await checkChallengeCompleted(submittedBy, challenge.id);
             if (!isCompleted) {
-                return false; 
+                
+                return response.status(404).json("not found a completed verse");  
             }
         }
         await updateNBBadge(submittedBy);
-        return true; // If all challenges are completed, return true
+        return response.status(200).json("Congratulations You just finished The verse and earnd Badge"); 
     } catch (error) {
         console.error('Error checking category completion:', error);
-        throw error;
+        return response.status(500).json("Something happend Please retry !")    
     }
 }
 
 
-export async function updateNBBadge(submittedBy: any): Promise<void> {
+ async function updateNBBadge(submittedBy: any) {
+
     try {
         const user = await db.user.findUnique({
             where: {
@@ -328,28 +330,30 @@ export async function updateNBBadge(submittedBy: any): Promise<void> {
         console.error('Error updating nbbadge:', error);
         throw error;
     }
-}
+ }
 
 
-async function checkChallengeCompleted(submittedBy: any, challengeId: number): Promise<boolean> {
+async function checkChallengeCompleted(submittedBy: number , challengeId: number): Promise<boolean> {
     try {
         const flags = await db.flag.findMany({
             where: {
-                challengeId: challengeId,
+                challenge:{
+                    id:challengeId
+                }
             }
         });
-
+        
         for (const flag of flags) {
             const existingSubmission = await db.submission.findFirst({
                 where: {
                     submittedBy: submittedBy,
                     challengeId: challengeId,
-                    flag: flag.key,
+                    flag:flag.key,
                     isCorrect: true,
                 }
             });
 
-            if (!existingSubmission || !existingSubmission.isCorrect) {
+            if (!existingSubmission || existingSubmission.isCorrect==false) {
                 return false;
             }
         }
