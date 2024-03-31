@@ -1,4 +1,4 @@
-import {SubmitChallenge,challengebyId,VersebyId,allVerses,VerseBadge} from '../controllers/challengesController';
+import {SubmitChallenge,challengebyId,VersebyId,allVerses,checkVerseCompleted} from '../controllers/challengesController';
 import express from "express";
 import { middleware} from '../middleware/authuser';
 
@@ -11,7 +11,7 @@ ChallengeRouter.get('/api/verses',[middleware.Auth,middleware.limiter],allVerses
 //get all verse_id challenges
 ChallengeRouter.get('/api/verse/:id/',[middleware.Auth,middleware.limiter],VersebyId)
 //
-ChallengeRouter.get('/api/verse/completed/:verse_id',[middleware.Auth,middleware.limiter],VerseBadge)
+ChallengeRouter.get('/api/verse/:verse_id/completed',[middleware.Auth,middleware.limiter],checkVerseCompleted)
 //get by id
 ChallengeRouter.get('/api/verse/:verse_id/challenges/:id',[middleware.Auth,middleware.limiter],challengebyId)
 //submit & check flag
