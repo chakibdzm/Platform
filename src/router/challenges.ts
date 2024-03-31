@@ -36,10 +36,8 @@ ChallengeRouter.post('/api/submit/:id',[middleware.Auth,middleware.limiter] ,Sub
  *                 $ref: '#/components/schemas/Verse'
  *       '500':
  *         description: Internal server error
- */
-
-/**
- * @swagger
+ *
+ * 
  * /api/verse/{id}:
  *   get:
  *     summary: Get challenges by verse ID
@@ -65,10 +63,9 @@ ChallengeRouter.post('/api/submit/:id',[middleware.Auth,middleware.limiter] ,Sub
  *         description: Verse not found
  *       '500':
  *         description: Internal server error
- */
-
-/**
- * @swagger
+ *
+ * 
+ * 
  * /api/verse/{verse_id}/completed:
  *   get:
  *     summary: Check if verse is completed
@@ -88,10 +85,9 @@ ChallengeRouter.post('/api/submit/:id',[middleware.Auth,middleware.limiter] ,Sub
  *         description: Verse not found or not completed
  *       '500':
  *         description: Internal server error
- */
-
-/**
- * @swagger
+ *
+ * 
+ * 
  * /api/verse/{verse_id}/challenges/{id}:
  *   get:
  *     summary: Get challenge by ID
@@ -121,10 +117,9 @@ ChallengeRouter.post('/api/submit/:id',[middleware.Auth,middleware.limiter] ,Sub
  *         description: Challenge not found
  *       '500':
  *         description: Internal server error
- */
-
-/**
- * @swagger
+ *
+ * 
+ * 
  * /api/submit/{id}:
  *   post:
  *     summary: Submit a challenge
@@ -153,4 +148,4 @@ ChallengeRouter.post('/api/submit/:id',[middleware.Auth,middleware.limiter] ,Sub
  *         description: Challenge not found
  *       '500':
  *         description: Internal server error
- */
+ **/
