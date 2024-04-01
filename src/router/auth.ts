@@ -5,8 +5,8 @@ import { signup } from '../controllers/userController';
 
 const authrouter = express.Router();
 
-authrouter.post('auth/signup', signup);
-authrouter.post('auth/signin', signin);
+authrouter.post('/auth/signup', signup);
+authrouter.post('/auth/signin', signin);
 
 export default authrouter;
 
