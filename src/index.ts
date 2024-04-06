@@ -39,7 +39,7 @@ const corsOptions = {
 
 app.use(helmet());  
 app.use(cors(corsOptions));
-app.use(cors());
+
 app.use(express.json());
 app.use("/",ScoreRouter);
 app.use("/",ChallengeRouter);
