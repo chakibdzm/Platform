@@ -41,8 +41,7 @@ model Challenge {
   submissions Submission[]
   flag        Flag[]
   
-
-
+  
 }
 
 
@@ -59,6 +58,7 @@ model Submission {
   submittedBy Int
   challengeId Int
   flag        String?
+  link        String?
   isCorrect   Boolean   @default(false)
   submittedAt DateTime  @default(now())
   challenge   Challenge @relation(fields: [challengeId], references: [id])
@@ -76,6 +76,7 @@ enum Field {
   PROBLEMSOLVING
   AI
 }
+
 
 enum TYPE {
   LINK
