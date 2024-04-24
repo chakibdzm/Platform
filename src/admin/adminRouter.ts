@@ -1,5 +1,5 @@
 import express from 'express';
-import { requireAdminRole ,adminController } from './adminController';
+import { requireAdminRole ,adminController,addverse,modifyrole } from './adminController';
 const adminRouter = express.Router();
 
 adminRouter.get('/users', requireAdminRole, adminController.getUsers);
@@ -10,6 +10,8 @@ adminRouter.put('/challenge/:id',requireAdminRole, adminController.updateChallen
 adminRouter.delete('/challenge/:id',requireAdminRole, adminController.deleteChallenge);
 adminRouter.get('/challenge',requireAdminRole, adminController.getAllChallenges);
 adminRouter.get('/challenge/:challengeId',requireAdminRole, adminController.getChallengeDetails);
+adminRouter.post('/verse/add',requireAdminRole,addverse)
+adminRouter.post('/role/admin-user',requireAdminRole,modifyrole)
 
 
 
