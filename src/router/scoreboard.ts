@@ -21,3 +21,24 @@ ScoreRouter.get('/api/scoreboard',[middleware.Auth,middleware.limiter],async (re
     }
 
 })
+
+
+/**
+ * @swagger
+ * /api/scoreboard:
+ *   get:
+ *     summary: Get scoreboard of users
+ *     tags:
+ *       - Scoreboard
+ *     responses:
+ *       '200':
+ *         description: A list of users sorted by score in descending order
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/UserScore'
+ *       '500':
+ *         description: Internal server error
+ */
