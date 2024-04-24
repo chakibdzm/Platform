@@ -52,9 +52,9 @@ async function ChallengebyId(challengeId:number) {
             difficulty:true,
             files:true,
             isEnabled:true,
+            submitType:true,
         }
     }
-
     )
 }
 
@@ -75,7 +75,6 @@ export const challengebyId=async(request:Request,response:Response)=>{
     }
 
 }
-
 
 
 export async function getChallenges(verseid:number) {
@@ -170,48 +169,118 @@ export async function getChallenges(verseid:number) {
 
 
 
-export const SubmitChallenge = async(request:Request,response:Response)=>{
-    const {flag } = request.body;
-    const challengeId=parseInt(request.params.id);
-    try{
+// export const SubmitChallenge = async(request:Request,response:Response)=>{
+//     const {flag } = request.body;
+//     const challengeId=parseInt(request.params.id);
+//     try{
+//         const token = request.headers.authorization?.split(' ')[1];
+//         if (!token) {
+//         return response .status(401).json({ error: 'Unauthorized: No token provided' });
+//          }
+
+//          const challenge=await ChallengebyId(challengeId);
+//          if(!challenge || challenge.isEnabled==false){
+//              return response.status(404).json({ error: 'Challenge not found' });
+//          }
+
+//          const decodedToken= await jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
+//          const submittedBy = decodedToken.userId;
+//         const submit =await Submit(submittedBy,challengeId,flag);
+//         const check =await checkFlagAndAwardPoints(submittedBy, challengeId, flag);
+//         if (check==false){
+//             return response.status(200).json("naah !!!");
+//         }
+
+//         await db.submission.updateMany({
+//             where: {
+//                 id:submit.id
+//             },
+//             data: {
+//                 isCorrect: true
+//             }
+//         });
+
+
+//         return response.status(200).json("Congratulations You Found it");
+        
+        
+
+
+//     }
+//     catch(error:any){
+//         return response.status(500).json(error.message);
+//     }
+// }
+
+export const SubmitChallenge = async (request: Request, response: Response) => {
+    const { submission } = request.body;
+    const challengeId = parseInt(request.params.id);
+    
+    try {
         const token = request.headers.authorization?.split(' ')[1];
         if (!token) {
-        return response .status(401).json({ error: 'Unauthorized: No token provided' });
-         }
-
-         const challenge=await ChallengebyId(challengeId);
-         if(!challenge || challenge.isEnabled==false){
-             return response.status(404).json({ error: 'Challenge not found' });
-         }
-
-         const decodedToken= await jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
-         const submittedBy = decodedToken.userId;
-        const submit =await Submit(submittedBy,challengeId,flag);
-        const check =await checkFlagAndAwardPoints(submittedBy, challengeId, flag);
-        if (check==false){
-            return response.status(200).json("naah !!!");
+            return response.status(401).json({ error: 'Unauthorized: No token provided' });
         }
 
-        await db.submission.updateMany({
-            where: {
-                id:submit.id
-            },
+        const challenge = await ChallengebyId(challengeId);
+        if (!challenge || !challenge.isEnabled ) {
+            return response.status(404).json({ error: 'Challenge not found or not enabled' });
+        }
+
+        const decodedToken = await jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
+        const submittedBy = decodedToken.userId;
+        
+        if (challenge.submitType === 'KEY' && !submission.flag) {
+            return response.status(400).json({ error: 'Flag submission must include a flag' });
+        } else if (challenge.submitType === 'LINK' && !submission.link) {
+            return response.status(400).json({ error: 'Link submission must include a link' });
+        }
+
+        const newSubmission = await db.submission.create({
             data: {
-                isCorrect: true
+                submittedBy: submittedBy,
+                challengeId: challengeId,
+                flag: submission.flag || null, 
+                link: submission.link || null,
+                submittedAt: new Date()
             }
         });
 
+        if (challenge.submitType === 'LINK') {
+            await db.submission.update({
+                where: {
+                    id: newSubmission.id
+                },
+                data: {
+                    isCorrect: true
+                }
+            });
 
-        return response.status(200).json("Congratulations You Found it");
-        
-        
+            return response.status(200).json({ message: "Link submission successful" });
+        } else {
+            const checkResult = await checkFlagAndAwardPoints(submittedBy, challengeId, submission.flag);
 
+            if (!checkResult) {
+                return response.status(200).json({ message: "Incorrect flag" });
+            }
 
-    }
-    catch(error:any){
-        return response.status(500).json(error.message);
+            await db.submission.update({
+                where: {
+                    id: newSubmission.id
+                },
+                data: {
+                    isCorrect: true
+                }
+            });
+
+            return response.status(200).json({ message: "Flag submission successful" });
+        }
+    } catch (error: any) {
+        return response.status(500).json({ error: error.message });
     }
 }
+
+
 
 
 

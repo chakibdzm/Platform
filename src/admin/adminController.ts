@@ -36,7 +36,7 @@ export const requireAdminRole = async (req: CustomRequest, res: Response, next: 
 // Controller to handle admin actions
 export const adminController = {
     
-    getUsers: async (req: Request, res: Response) => {
+  getUsers: async (req: Request, res: Response) => {
         try {
             const users = await prisma.user.findMany();
             res.json(users);
@@ -46,7 +46,7 @@ export const adminController = {
         }
     },
 
-    getUserDetails : async (req: Request, res: Response) => {
+  getUserDetails : async (req: Request, res: Response) => {
         const userId = parseInt(req.params.userId);
     
         try {
@@ -63,8 +63,8 @@ export const adminController = {
     },
 
 
-    createChallenge : async (req: Request, res: Response) => {
-    const { title, story, hint, total_points, isEnabled, difficulty, files, submitType, verseId } = req.body;
+  createChallenge : async (req: Request, res: Response) => {
+    const { title, story, hint, total_points, isEnabled, difficulty, files, submitType, verseId , wave , flags } = req.body;
 
     try {
         const challenge = await prisma.challenge.create({
@@ -78,7 +78,14 @@ export const adminController = {
                 files,
                 submitType,
                 verseId,
+                wave,
+                flag: {
+                    create: flags // Assuming "flags" is an array of flag objects
+                },
             },
+            include: {
+                flag: true // Include the flags in the response
+            }
         });
 
         res.status(201).json(challenge);
@@ -90,7 +97,7 @@ export const adminController = {
 
     updateChallenge : async (req: Request, res: Response) => {
     const { id } = req.params; // Get the challenge ID from the request params
-    const { title, story, hint, total_points, isEnabled, difficulty, files, submitType, verseId } = req.body;
+    const { title, story, hint, total_points, isEnabled, difficulty, files, submitType, verseId , wave } = req.body;
 
     try {
         // Check if the challenge exists
@@ -112,6 +119,7 @@ export const adminController = {
                 files,
                 submitType,
                 verseId,
+                wave,
             },
         });
 
@@ -186,7 +194,7 @@ export const adminController = {
 },
 
 
-   getAllVerses : async (req: Request, res: Response) => {
+    getAllVerses : async (req: Request, res: Response) => {
     try {
         const verses = await prisma.verse.findMany();
         res.json(verses);
@@ -208,6 +216,27 @@ export const adminController = {
         console.error('Error fetching verse:', error);
         res.status(500).json({ error: 'Failed to fetch verse' });
     }
-}
+} ,
+
+enableChallengesPerWave: async (req: Request, res: Response) => {
+    const { wave } = req.body;
+
+    try {
+        // Update isEnabled 
+        await prisma.challenge.updateMany({
+            where: {
+                wave: wave,
+            },
+            data: {
+                isEnabled: true,
+            },
+        });
+
+        res.status(200).json({ message: `All challenges for wave ${wave} enabled successfully` });
+    } catch (error) {
+        console.error('Error enabling challenges:', error);
+        res.status(500).json({ error: 'Failed to enable challenges' });
+    }
+},
     
 };
