@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import * as jwt from 'jsonwebtoken';
+import { title } from 'process';
 
 const prisma = new PrismaClient();
 
@@ -240,3 +241,42 @@ enableChallengesPerWave: async (req: Request, res: Response) => {
 },
     
 };
+
+export const addverse = async (request:Request,response:Response) => {
+    const {title}=request.body;
+    try{
+        const verse= await prisma.verse.create(
+            {
+                data:{
+                    title:title
+            }
+            }
+        )
+        response.status(201).json(verse)
+    }
+    catch(error)
+    {
+        response.status(500).json(" Something wrong !")    }
+
+
+}
+
+export const modifyrole = async (request:Request,response:Response)=>{
+    const {id}=request.body;
+
+    try{
+        const role= await prisma.user.update({
+            where:{
+                id:parseInt(id)
+        },
+            data:{
+                role:"ADMIN"
+            }
+        })
+        response.status(201).json("done created!!")
+    }
+    catch(error)
+    {
+        response.status(500).json("Something wrong !")    }
+    
+}
