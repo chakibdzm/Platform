@@ -6,7 +6,7 @@ import { middleware } from '../middleware/authuser';
 import type { Request,Response } from 'express';
 export const ScoreRouter= express.Router();
 
-ScoreRouter.get('/api/scoreboard',[middleware.Auth,middleware.limiter],async (request:Request, response:Response) =>{
+ScoreRouter.get('/api/scoreboard',[middleware.Auth],async (request:Request, response:Response) =>{
     try {
         const users=await ScoarboardList.listUsers();
         if (!users)
