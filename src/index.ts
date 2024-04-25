@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 const app=express();
 
 const corsOptions = {
-    origin: 'https://project-0-tan.vercel.app/', 
+    origin: 'https://project-0-tan.vercel.app', 
     methods: ['GET', 'POST','PUT'], 
     allowedHeaders: ['Content-Type', 'Authorization'], 
     Credential: true,
