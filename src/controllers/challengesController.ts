@@ -30,6 +30,7 @@ export async function listVerse() {
             difficulty:true,
             files:true,
             isEnabled:true,
+            submitType:true,
         }
     }
 
