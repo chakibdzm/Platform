@@ -36,7 +36,7 @@ const corsOptions = {
   
   const swaggerDocs = swaggerJsdoc(swaggerOptions);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
+app.set("trust proxy", true);
 app.use(helmet());  
 app.use(cors(corsOptions));
 
