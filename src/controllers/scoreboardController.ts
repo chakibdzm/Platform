@@ -22,6 +22,7 @@ export const listUsers = async (): Promise<Users[]> =>{
             id: true,
             name: true,
             score: true,
+            nbBadge:true,
             
          },
          orderBy:[
