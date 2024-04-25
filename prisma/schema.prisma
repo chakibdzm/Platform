@@ -41,7 +41,6 @@ model Challenge {
   submissions Submission[]
   flag        Flag[]
   
-  
 }
 
 
@@ -88,3 +87,4 @@ enum Difficulty {
   MEDIUM
   HARD
 }
+
