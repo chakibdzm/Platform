@@ -283,7 +283,7 @@ export const SubmitChallenge = async (request: Request, response: Response) => {
             const checkResult = await checkFlagAndAwardPoints(submittedBy, challengeId, submission.flag);
 
             if (!checkResult) {
-                return response.status(400).json({ message: "Incorrect flag" });
+                return response.status(200).json({ message: "Incorrect flag" });
             }
 
             await db.submission.update({
