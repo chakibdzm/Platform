@@ -7,15 +7,15 @@ import { middleware} from '../middleware/authuser';
 export const ChallengeRouter= express.Router();
 
 //all verses
-ChallengeRouter.get('/api/verses',[middleware.Auth,middleware.limiter],allVerses)
+ChallengeRouter.get('/api/verses',[middleware.Auth],allVerses)
 //get all verse_id challenges
-ChallengeRouter.get('/api/verse/:id/',[middleware.Auth,middleware.limiter],VersebyId)
+ChallengeRouter.get('/api/verse/:id/',[middleware.Auth],VersebyId)
 //
-ChallengeRouter.get('/api/verse/:verse_id/completed',[middleware.Auth,middleware.limiter],checkVerseCompleted)
+ChallengeRouter.get('/api/verse/:verse_id/completed',[middleware.Auth],checkVerseCompleted)
 //get by id
-ChallengeRouter.get('/api/verse/:verse_id/challenges/:id',[middleware.Auth,middleware.limiter],challengebyId)
+ChallengeRouter.get('/api/verse/:verse_id/challenges/:id',[middleware.Auth],challengebyId)
 //submit & check flag
-ChallengeRouter.post('/api/submit/:id',[middleware.Auth,middleware.limiter] ,SubmitChallenge)
+ChallengeRouter.post('/api/submit/:id',[middleware.Auth,] ,SubmitChallenge)
 
 
 /**
