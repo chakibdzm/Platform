@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import rateLimit from 'express-rate-limit';
+
 
 
 
@@ -20,12 +20,6 @@ export interface DecodedToken {
 
 
 export const middleware={
-
-    limiter :  rateLimit({
-        windowMs: 60 * 1000, // 1 minute
-        max: 15,
-        message: 'Too many requests, please try again later.',
-      }),
 
     Auth :async (req: CustomRequest, res: Response, next: NextFunction) => {
     

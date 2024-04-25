@@ -20,7 +20,18 @@ async function insertChallenge() {
        // verseId: 1
      // }
    // });
-   const newChallenge=await prisma.submission.deleteMany({});
+   const newChallenge=await prisma.challenge.update({
+    where:{
+      id:11
+    }
+    ,
+    data:{
+      isEnabled:false,
+      total_points:0
+    }
+
+   });
+
 
 
 
