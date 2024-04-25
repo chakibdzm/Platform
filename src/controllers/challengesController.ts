@@ -132,8 +132,29 @@ export async function getChallenges(verseid:number) {
             where: {
                 challengeId: challengeId,
                 key:submittedFlag
+            },select: {
+                points:true,
             }
         });
+        
+        const response = await db.challenge.findFirst({
+            where: {
+                id: challengeId,
+            },select:{
+                total_points:true
+            }
+        })
+        const total = response?.total_points
+        if (total!=null){
+        const updatePoints = await db.challenge.update({
+            where:{
+                id:challengeId,
+            },
+           data: {
+                total_points:total + (flag?.points || 0),
+            }
+        })
+    }
 
         if (!flag) {
            
@@ -141,7 +162,7 @@ export async function getChallenges(verseid:number) {
         }
 
         
-        const extraPoints = flag.points || 500; 
+        const extraPoints = flag.points || 0; 
         await db.user.update({
             where: {
                 id: submittedBy

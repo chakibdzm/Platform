@@ -30,7 +30,7 @@ model Challenge {
   title       String?
   story       String?
   hint        Field
-  total_points Int?
+  total_points Int? 
   isEnabled   Boolean @default(false)
   wave        Int?
   difficulty  Difficulty   @default(EASY)
