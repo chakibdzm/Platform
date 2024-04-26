@@ -1,47 +1,26 @@
-import { challengebyId } from "../src/controllers/challengesController";
-
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-async function insertChallenge() {
+async function updateUserScore(userId: number, scoreToAdd: number) {
   try {
-    //const newChallenge = await prisma.challenge.create({
-      //data: {
-        //title: 'The 100',
-       // story: 'Test',
-     //   hint: 'PROBLEMSOLVING',
-   //     total_points: 500,
-    //    isEnabled: true,
-    //    wave: 5,
-    //    difficulty: 'HARD',
-    //    files: 'https://drive.google.com/drive/u/0/folders/1EMINQscRVcA8CLe72WtVypkocCUYJuxz',
-    //    submitType: 'KEY',
-       // verseId: 1
-     // }
-   // });
-   const newChallenge=await prisma.challenge.update({
-    where:{
-      id:11
-    }
-    ,
-    data:{
-      isEnabled:false,
-      total_points:0
-    }
-
-   });
-
-
-
-
-    
-    console.log('New challenge created:', newChallenge);
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        score: {
+          increment: scoreToAdd
+        }
+      }
+    });
+    console.log(`User score updated successfully: ${user}`);
   } catch (error) {
-    console.error('Error creating challenge:', error);
+    console.error(`Error updating user score: ${error}`);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-insertChallenge();
+// Usage
+const userId = 10; // Replace with the actual user ID
+const scoreToAdd = 200;
+updateUserScore(userId, scoreToAdd);
